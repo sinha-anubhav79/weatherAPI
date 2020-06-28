@@ -41,7 +41,7 @@ button.addEventListener('click', getWeather);
 /*-----------------------------Function to set background image--------------------------------------------*/
 function setBackImage(img_name){
     if (weatherImage[img_name.toLowerCase()] == 1){
-        box.style.backgroundImage = 'url(./resources/images/'+img_name+'.jpg)';
+        box.style.backgroundImage = 'url(./resources/images/'+img_name.toLowerCase()+'.jpg)';
     }else{
         box.style.backgroundImage = 'url(./resources/images/landscape.png)';
     }
