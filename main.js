@@ -41,7 +41,7 @@ button.addEventListener('click', getWeather);
 /*-----------------------------Function to set background image--------------------------------------------*/
 function setBackImage(img_name){
     if (weatherImage[img_name.toLowerCase()] == 1){
-        box.style.backgroundImage = 'url(./resources/images/'+img_name.toLowerCase()+'.jpg)';
+        box.style.backgroundImage = 'url(./resources/images/'+img_name+'.jpg)';
     }else{
         box.style.backgroundImage = 'url(./resources/images/landscape.png)';
     }
@@ -176,8 +176,8 @@ function getLocation() {
     let dir_lat = ' N', dir_lon = ' E'
     if (lat_value<0)  dir_lat = ' S' 
     if (lon_value<0)  dir_lon = ' W'
-    latitude.innerHTML = Math.abs(lat_value)+dir_lat;
-    longitude.innerHTML = Math.abs(lon_value)+dir_lon;
+    latitude.innerHTML = Math.abs(lat_value.toFixed(2))+dir_lat;
+    longitude.innerHTML = Math.abs(lon_value.toFixed(2))+dir_lon;
 
     getCurrentWeather(count)
 
