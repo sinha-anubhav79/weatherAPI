@@ -3,6 +3,7 @@ let result = document.getElementById("result")
 let display_results = document.querySelector('.results')
 let location = document.querySelector('#location')
 let button = document.querySelector('.search_button')
+let input = document.querySelector('input')
 let description = document.querySelector('.desc')
 let temperature = document.querySelector('.temp')
 let weather_date = document.querySelector('.weather_date')
@@ -37,6 +38,9 @@ const weatherImage = {
 setHeaderDate();
 getLocation();
 button.addEventListener('click', getWeather);
+input.addEventListener('keydown', (key) => {
+    if(key.which == 13) getWeather();
+})
 
 /*-----------------------------Function to set background image--------------------------------------------*/
 function setBackImage(img_name){
@@ -50,11 +54,11 @@ function setBackImage(img_name){
 
 /*-----------------------------Function fetching weather data---------------------------------------------*/
 //current weather and forecast data
-function getCurrentWeather(count){
-    fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+lat_value+"&lon="+lon_value+"&units=metric&exclude=hourly,currently&appid="+apiID)
+async function getCurrentWeather(count){
+    await fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+lat_value+"&lon="+lon_value+"&units=metric&exclude=hourly,currently&appid="+apiID)
     .then(resp1 => resp1.json())
     .then(weather => {
-        console.log(weather)
+        //console.log(weather)
         desc_val = weather['daily'][count]['weather'][0]['description'];
         temp_val = Math.round(weather['daily'][count]['temp']['day']);
         humid_value = weather['daily'][count]['humidity'];
@@ -66,17 +70,17 @@ function getCurrentWeather(count){
         temperature.innerHTML = temp_val;
         humidity.innerHTML = humid_value+" %";
         wind.innerHTML = wind_value+" m/s";
-        console.log(img_name)
+        //console.log(img_name)
         setBackImage(img_name)
     })
 }
 
 //past weather data
-function getPastWeather(){
-    fetch("https://api.openweathermap.org/data/2.5/onecall/timemachine?lat="+lat_value+"&lon="+lon_value+"&units=metric&dt="+var_dt+"&appid="+apiID)
+async function getPastWeather(){
+    await fetch("https://api.openweathermap.org/data/2.5/onecall/timemachine?lat="+lat_value+"&lon="+lon_value+"&units=metric&dt="+var_dt+"&appid="+apiID)
     .then(resp2 => resp2.json())
     .then(past_weather =>{
-        console.log(past_weather)
+        //console.log(past_weather)
         desc_val = past_weather['current']['weather'][0]['description'];
         temp_val = Math.round(past_weather['current']['temp']);
         humid_value = past_weather['current']['humidity'];
@@ -88,7 +92,7 @@ function getPastWeather(){
         temperature.innerHTML = temp_val;
         humidity.innerHTML = humid_value+" %";
         wind.innerHTML = wind_value+" m/s";
-        console.log(img_name)
+        //console.log(img_name)
         setBackImage(img_name)
     })
 }
@@ -106,6 +110,7 @@ rightslide.addEventListener('click',() => {
             getPastWeather()
     }
 })
+
 leftslide.addEventListener('click',() => {
     if(count>-5){
         count-=1;
@@ -117,10 +122,35 @@ leftslide.addEventListener('click',() => {
             getPastWeather()
     }    
 })
+
+window.addEventListener('keydown', (key) => {
+    if(key.which == 39){
+        if(count<7){
+            count+=1;
+            var_date.setDate(var_date.getDate()+1)
+            var_dt = Math.round((var_date.getTime())/1000)
+            if(count>=0 && count<8)
+                getCurrentWeather(count);
+            else if(count>-6 && count<0)
+                getPastWeather()
+        }
+    }
+    else if(key.which == 37){
+        if(count>-5){
+            count-=1;
+            var_date.setDate(var_date.getDate()-1)
+            var_dt = Math.round((var_date.getTime())/1000)
+            if(count>=0 && count<8)
+                getCurrentWeather(count);
+            else if(count>-6 && count<0)
+                getPastWeather()
+        }
+    }
+})
 /*-----------------------------Next and previous Buttons----------------------------------------------*/
 
 /*-----------------------------Search function----------------------------------------------*/
-function getWeather(){
+async function getWeather(){
     setTimeout(() => display_results.style.opacity = "0", 200);
     result.style.display = "none";
     loader.style.display = "flex";
@@ -129,7 +159,7 @@ function getWeather(){
     var_date = new Date();
     count = 0;
 
-    fetch('https://api.openweathermap.org/data/2.5/weather?q='+location.value+'&appid='+apiID)
+    await fetch('https://api.openweathermap.org/data/2.5/weather?q='+location.value+'&appid='+apiID)
     .then(response => response.json())
     .then(data => {
         location.value = data['name']+', '+data['sys']['country'];
@@ -163,8 +193,7 @@ function getLocation() {
   function showPosition(position) {
     lat_value = position.coords.latitude;
     lon_value = position.coords.longitude
-    //console.log("Latitude: " + lat_value + "Longitude: " + lon_value);
-
+    
     setTimeout(() => display_results.style.opacity = "0", 200);
     result.style.display = "none";
     loader.style.display = "flex";
